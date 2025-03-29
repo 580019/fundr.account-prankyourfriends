@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundr - Send & Request Money</title>
+    <style>
+        :root {
+            --primary: #00b347;
+            --primary-dark: #008a37;
+            --secondary: #222222;
+            --light: #f8f9fa;
+            --gray: #e9ecef;
+            --dark-gray: #6c757d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--gray);
+            color: var(--secondary);
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        header {
+            background-color: var(--secondary);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .header-icons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .balance-section {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .balance-amount {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 1rem;
+        }
+        
+        .btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn.secondary:hover {
+            background-color: #333333;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding: 1rem;
+        }
+        
+        .feature-btn {
+            background-color: var(--light);
+            border: 1px solid var(--gray);
+            padding: 1rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.3s;
+        }
+        
+        .feature-btn:hover {
+            background-color: var(--gray);
+        }
+        
+        .transactions {
+            padding: 1rem;
+        }
+        
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .transaction-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .transaction-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .transaction-amount {
+            font-weight: bold;
+        }
+        
+        .positive {
+            color: var(--primary);
+        }
+        
+        .negative {
+            color: #dc3545;
+        }
+        
+        nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--secondary);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.8rem 0;
+        }
+        
+        .nav-item {
+            color: var(--dark-gray);
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.7rem;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--gray);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .modal-actions button {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn-cancel {
+            background-color: var(--gray);
+        }
+        
+        .btn-confirm {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Icons */
+        .material-icons {
+            font-size: 24px;
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Fundr</div>
+            <div class="header-icons">
+                <span class="material-icons">notifications</span>
+                <span class="material-icons">account_circle</span>
+            </div>
+        </header>
+        
+        <div class="balance-section">
+            <div>Available Balance</div>
+            <div class="balance-amount">$1,250.75</div>
+            <div>Updated: Today, 2:30 PM</div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="openModal('sendMoneyModal')">
+                <span class="material-icons">send</span>
+                Send Money
+            </button>
+            <button class="btn secondary" onclick="openModal('requestMoneyModal')">
+                <span class="material-icons">call_received</span>
+                Request Money
+            </button>
+        </div>
+        
+        <div class="features">
+            <button class="feature-btn">
+                <span class="material-icons">account_balance</span>
+                Bank Transfer
+            </button>
+            <button class="feature-btn">
+                <span class="material-icons">credit_card</span>
+                Cards
+            </button>
+            <button class="feature-btn">
+                <span class="material-icons">qr_code_scanner</span>
+                Scan QR
+            </button>
+            <button class="feature-btn">
+                <span class="material-icons">trending_up</span>
+                Invest
+            </button>
+            <button class="feature-btn">
+                <span class="material-icons">payments</span>
+                Loan
+            </button>
+            <button class="feature-btn">
+                <span class="material-icons">more_horiz</span>
+                More
+            </button>
+        </div>
+        
+        <div class="transactions">
+            <h3>Recent Transactions</h3>
+            
+            <div class="transaction-item">
+                <div class="transaction-info">
+                    <div class="transaction-avatar">
+                        <span class="material-icons">person</span>
+                    </div>
+                    <div>
+                        <div>James Smith</div>
+                        <div class="transaction-date">Mar 28, 2025</div>
+                    </div>
+                </div>
+                <div class="transaction-amount negative">-$45.00</div>
+            </div>
+            
+            <div class="transaction-item">
+                <div class="transaction-info">
+                    <div class="transaction-avatar">
+                        <span class="material-icons">store</span>
+                    </div>
+                    <div>
+                        <div>Coffee Shop</div>
+                        <div class="transaction-date">Mar 27, 2025</div>
+                    </div>
+                </div>
+                <div class="transaction-amount negative">-$5.75</div>
+            </div>
+            
+            <div class="transaction-item">
+                <div class="transaction-info">
+                    <div class="transaction-avatar">
+                        <span class="material-icons">person</span>
+                    </div>
+                    <div>
+                        <div>Sarah Johnson</div>
+                        <div class="transaction-date">Mar 25, 2025</div>
+                    </div>
+                </div>
+                <div class="transaction-amount positive">+$120.00</div>
+            </div>
+        </div>
+        
+        <nav>
+            <a href="#" class="nav-item active">
+                <span class="material-icons">home</span>
+                Home
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons">history</span>
+                History
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons">savings</span>
+                Finance
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons">settings</span>
+                Settings
+            </a>
+        </nav>
+    </div>
+    
+    <!-- Send Money Modal -->
+    <div id="sendMoneyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Send Money</div>
+            <div class="form-group">
+                <label for="recipient">Recipient</label>
+                <input type="text" id="recipient" placeholder="Username, phone, or email">
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="text" id="amount" placeholder="Enter amount">
+            </div>
+            <div class="form-group">
+                <label for="note">Note (Optional)</label>
+                <input type="text" id="note" placeholder="What's it for?">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('sendMoneyModal')">Cancel</button>
+                <button class="btn-confirm" onclick="simulateSend()">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Request Money Modal -->
+    <div id="requestMoneyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Request Money</div>
+            <div class="form-group">
+                <label for="requestFrom">Request From</label>
+                <input type="text" id="requestFrom" placeholder="Username, phone, or email">
+            </div>
+            <div class="form-group">
+                <label for="requestAmount">Amount</label>
+                <input type="text" id="requestAmount" placeholder="Enter amount">
+            </div>
+            <div class="form-group">
+                <label for="requestNote">Note (Optional)</label>
+                <input type="text" id="requestNote" placeholder="What's it for?">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('requestMoneyModal')">Cancel</button>
+                <button class="btn-confirm" onclick="simulateRequest()">Request</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "flex";
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+        
+        function simulateSend() {
+            const amount = document.getElementById('amount').value;
+            const recipient = document.getElementById('recipient').value;
+            
+            if (!amount || !recipient) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            alert(`Successfully sent $${amount} to ${recipient}`);
+            closeModal('sendMoneyModal');
+            
+            // Reset form
+            document.getElementById('amount').value = '';
+            document.getElementById('recipient').value = '';
+            document.getElementById('note').value = '';
+        }
+        
+        function simulateRequest() {
+            const amount = document.getElementById('requestAmount').value;
+            const recipient = document.getElementById('requestFrom').value;
+            
+            if (!amount || !recipient) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            alert(`Request for $${amount} sent to ${recipient}`);
+            closeModal('requestMoneyModal');
+            
+            // Reset form
+            document.getElementById('requestAmount').value = '';
+            document.getElementById('requestFrom').value = '';
+            document.getElementById('requestNote').value = '';
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const sendModal = document.getElementById('sendMoneyModal');
+            const requestModal = document.getElementById('requestMoneyModal');
+            
+            if (event.target === sendModal) {
+                sendModal.style.display = "none";
+            }
+            
+            if (event.target === requestModal) {
+                requestModal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
