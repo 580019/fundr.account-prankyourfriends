@@ -1369,30 +1369,35 @@
         document.getElementById('recipient').value = '';
         document.getElementById('note').value = '';
     }
-    
     function requestMoney() {
-        const amount = parseFloat(document.getElementById('requestAmount').value);
-        const requester = document.getElementById('requestFrom').value;
-        const note = document.getElementById('requestNote').value;
-        
-        if (!amount || isNaN(amount) || amount <= 0) {
-            showToast('Please enter a valid amount', 'error');
-            return;
-        }
-        
-        if (!requester || requester.trim() === '') {
-            showToast('Please enter a name', 'error');
-            return;
-        }
-        
-        closeModal('requestMoneyModal');
-        showToast(`$${amount.toFixed(2)} requested from ${requester}`, 'success');
-        
-        // Clear form
-        document.getElementById('requestAmount').value = '';
-        document.getElementById('requestFrom').value = '';
-        document.getElementById('requestNote').value = '';
+    const amount = parseFloat(document.getElementById('requestAmount').value);
+    const requester = document.getElementById('requestFrom').value;
+    const note = document.getElementById('requestNote').value;
+    
+    if (!amount || isNaN(amount) || amount <= 0) {
+        showToast('Please enter a valid amount', 'error');
+        return;
     }
+    
+    if (!requester || requester.trim() === '') {
+        showToast('Please enter a name', 'error');
+        return;
+    }
+    
+    // Update balance and add transaction
+    currentBalance += amount;
+    updateBalanceDisplay();
+    addTransaction(requester, amount, note || 'Money received');
+    updateLastUpdated();
+    
+    closeModal('requestMoneyModal');
+    showToast(`$${amount.toFixed(2)} received from ${requester}`, 'success');
+    
+    // Clear form
+    document.getElementById('requestAmount').value = '';
+    document.getElementById('requestFrom').value = '';
+    document.getElementById('requestNote').value = '';
+}
     
     function openModal(modalId) {
         document.getElementById(modalId).style.display = 'flex';
